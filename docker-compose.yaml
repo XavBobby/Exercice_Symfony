@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+
+  php:
+    build:
+      context: ./php
+    container_name: php82
+    ports:
+      - 8000:80
+    volumes:
+      - ./app:/var/www
+      - ./apache/default.conf:/etc/apache2/sites-enabled/000-default.conf
+    depends_on:
+      - database
+    # Pour lancer terminal : docker-compose exec php /bin/bash (ou bash)
+
+  database:
+    image: mysql:8.0
+    container_name: mysql80
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: symfony7_docker
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+    ports:
+      - '3307:3306'
+    volumes:
+      - ./mysql:/var/lib/mysql
+    # Pour lancer terminal : docker-compose exec database /bin/bash
+    # mysql -u root -p
+    # show databases;
+
+  phpma:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    environment:
+      PMA_ARBITRARY: 1
+      PMA_HOST: database
+      PMA_USER: root
+      PMA_PASSWORD: root
+      UPLOAD_LIMIT: 20M
+    ports:
+      - 8001:80
+    depends_on:
+      - php
+
+  #adminer:
+  #  image: adminer
+  #  container_name: adminer
+  #  restart: always
+  #  environment:
+  #    ADMINER_DEFAULT_SERVER: database
+  #  ports:
+  #    - 8002:8080
+
+  #mailhog:
+  #  image: mailhog/mailhog
+  #  container_name: mailhog
+  #  logging:
+  #    driver: 'none'  # disable saving logs
+  #  ports:
+  #    - 1025:1025 # smtp server
+  #    - 8025:8025 # web ui
+
+  ###> symfony/mailer ###
+  mailer:
+    image: axllent/mailpit
+    container_name: mailer
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    ports:
+      - 1025:1025
+      - 8025:8025
+  ###< symfony/mailer ###

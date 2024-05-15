@@ -1,0 +1,9 @@
+<div class="example-wrapper">
+    <h1>Hello {{ controller_name }}! ✅</h1>
+    {{ dump(id) }}
+    This friendly message is coming from:
+    <ul>
+<a href="{{ path('app_test') }}">Lien vers test</a>
+<a href="{{ path('test_id', {id: 13}) }}">Lien vers test_id</a>
+    </ul>
+</div>
